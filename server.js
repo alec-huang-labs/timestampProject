@@ -24,9 +24,37 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
+app.use("/api/:timeRequest", function(req,res){
+  console.log("New Test")
+  let timeStr = req.params.timeRequest;
+  if(new Date(parseInt(timeStr))!= "Invalid Date"){
+    var regex = /^\d+$/;
+    console.log(req.params.timeRequest)
+    let isUnix = regex.test(timeStr);
+    if(isUnix){
+      let unixTime = new Date(parseInt(timeStr))
+      res.json({"unix": parseInt(req.params.timeRequest), 
+                "utc": unixTime.toUTCString()})
+    }else{
+      let normDate = new Date(timeStr);
+      let convertedTime = normDate.getTime()
+      res.json({"unix": convertedTime, 
+                "utc" : normDate.toUTCString()})
+    } 
+  } else {
+    res.json({error : "Invalid Date"})
+  }
+})
 
+app.use("/api", function(req,res){
+    res.json({"unix": new Date().getTime(),
+              "utc": new Date().toUTCString()
+    })
+})
 
 // listen for requests :)
-var listener = app.listen(process.env.PORT, function () {
+const port = 8000;
+var listener = app.listen(port, function () {
   console.log('Your app is listening on port ' + listener.address().port);
 });
+//go to: http://localhost:8000 in browser
